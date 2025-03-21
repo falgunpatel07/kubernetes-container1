@@ -77,7 +77,7 @@ app.post('/calculate', async (req, res) => {
         error: "Input file not in CSV format."
       });
     }
-    // hi i just want to verify whether it is working or not
+    // just checking the ci/cd pipeline
     // Second check: try to parse using csv-parse
     let records;
     try {
