@@ -1,0 +1,35 @@
+# container1/cloudbuild.yaml
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/kubernetes-repo/container1:${SHORT_SHA}', '.']
+  
+  # Push the container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/kubernetes-repo/container1:${SHORT_SHA}']
+  
+  # Deploy container image to GKE
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+    - 'set'
+    - 'image'
+    - 'deployment/container1'
+    - 'container1=us-central1-docker.pkg.dev/${PROJECT_ID}/kubernetes-repo/container1:${SHORT_SHA}'
+    env:
+    - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=kubernetes-assignment-cluster'
+  
+  # Get the service IP and update the status
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+    - 'get'
+    - 'service'
+    - 'container1-service'
+    - '-o=jsonpath={.status.loadBalancer.ingress[0].ip}'
+    env:
+    - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=kubernetes-assignment-cluster'
+    id: 'get-service-ip'
+
+images:
+- 'us-central1-docker.pkg.dev/${PROJECT_ID}/kubernetes-repo/container1:${SHORT_SHA}'
