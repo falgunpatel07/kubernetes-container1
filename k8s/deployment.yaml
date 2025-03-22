@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: container1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: container1
+  template:
+    metadata:
+      labels:
+        app: container1
+    spec:
+      containers:
+        - name: container1
+          image: us-central1-docker.pkg.dev/kubernetes-454319/kubernetes-repo/container1:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: CONTAINER2_URL
+              value: "http://container2-service:3001"
+            - name: STORAGE_DIR
+              value: "/Falgun_PV_dir"
+            - name: PORT
+              value: "3000"
+          volumeMounts:
+            - name: shared-data
+              mountPath: /Falgun_PV_dir
+      volumes:
+        - name: shared-data
+          persistentVolumeClaim:
+            claimName: falgun-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: container1-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 3000
+  selector:
+    app: container1

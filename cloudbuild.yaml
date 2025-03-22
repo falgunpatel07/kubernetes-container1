@@ -7,31 +7,28 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/kubernetes-repo/container1:latest']
   
-  # Deploy container image to GKE
-  - name: 'gcr.io/cloud-builders/kubectl'
+  # Set up kubectl and authenticate with GKE
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     args:
-    - 'set'
-    - 'image'
-    - 'deployment/container1'
-    - 'container1=us-central1-docker.pkg.dev/${PROJECT_ID}/kubernetes-repo/container1:latest'
-    env:
-    - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
-    - 'CLOUDSDK_CONTAINER_CLUSTER=kubernetes-assignment-cluster'
+      - 'gcloud'
+      - 'container'
+      - 'clusters'
+      - 'get-credentials'
+      - 'kubernetes-assignment-cluster'
+      - '--zone'
+      - 'us-central1-c'
+    id: 'Set up kubectl'
   
-  # Get the service IP and update the status
-  - name: 'gcr.io/cloud-builders/kubectl'
+  # Deploy using the YAML file from k8s folder
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     args:
-    - 'get'
-    - 'service'
-    - 'container1-service'
-    - '-o=jsonpath={.status.loadBalancer.ingress[0].ip}'
-    env:
-    - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
-    - 'CLOUDSDK_CONTAINER_CLUSTER=kubernetes-assignment-cluster'
-    id: 'get-service-ip'
-
-options:
-  logging: CLOUD_LOGGING_ONLY
+      - 'kubectl'
+      - 'apply'
+      - '-f'
+      - 'k8s/deployment.yaml'
+    id: 'Deploy container1 to GKE'
 
 images:
-- 'us-central1-docker.pkg.dev/${PROJECT_ID}/kubernetes-repo/container1:latest'
+  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/kubernetes-repo/container1:latest'
+options:
+  logging: CLOUD_LOGGING_ONLY
