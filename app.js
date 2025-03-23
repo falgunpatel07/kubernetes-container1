@@ -8,6 +8,7 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 // test
+//kube video
 // Configuration
 const PORT = process.env.PORT || 3000;
 const STORAGE_DIR = process.env.STORAGE_DIR || './storage'; // This will map to PV in k8s
