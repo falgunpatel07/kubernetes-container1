@@ -8,7 +8,6 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 // test
-// Configuration
 const PORT = process.env.PORT || 3000;
 const STORAGE_DIR = process.env.STORAGE_DIR || './storage'; // This will map to PV in k8s
 const CONTAINER2_URL = process.env.CONTAINER2_URL || 'http://localhost:3001'; // Will be service name in k8s
