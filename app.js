@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
-// ci cd container1 testing
+
 const app = express();
 app.use(bodyParser.json());
 // test
